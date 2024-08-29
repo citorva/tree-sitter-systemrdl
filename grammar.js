@@ -450,7 +450,7 @@ const rules = {
 
   // 16 Preprocessor directives
 
-  template: $ => token(seq('<%', /[^%]+/, '%>')),
+  template: $ => token(seq('<%', field("perl-code", /[^%]+/), '%>')),
 
   preprocessor: $ => seq(
     choice(
