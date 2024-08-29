@@ -494,8 +494,8 @@ module.exports = grammar({
   rules: rules,
   extras: $ => [
     /\s|\\\r?\n/,
-    $.comment
-    // $.template
+    $.comment,
+    $.template
   ]
 });
 
