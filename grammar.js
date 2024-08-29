@@ -28,7 +28,8 @@ const rules = {
     $.struct_def,
     $.constraint_def,
     $.explicit_component_inst,
-    $.property_assignment
+    $.property_assignment,
+    $.preprocessor
   ),
 
   // B.2 User-defined properties
@@ -447,10 +448,44 @@ const rules = {
     )
   )),
 
-  // 16.1 Embedded Perl preprocessing
+  // 16 Preprocessor directives
 
-  template: $ => token(seq('<%', /[^%]+/, '%>'))
+  template: $ => token(seq('<%', /[^%]+/, '%>')),
 
+  preprocessor: $ => seq(
+    choice(
+      field('define', $.pre_define),
+      field('include', $.pre_include),
+      field('condition', $.pre_cond),
+      field('line', $.pre_line),
+      field('undef', $.pre_undef),
+    ),
+    '\n',
+  ),
+
+  pre_define: $ => seq(
+    '`define',
+    $.id,
+    optional(seq('(', sep1(',', $.id), ')')),
+    /.*/
+  ),
+  pre_include: $ => seq('`include', $.string_literal),
+  pre_cond: $ => seq(
+    choice($.pre_ifdef, $.pre_ifndef),
+    '\n',
+    repeat($.description),
+    repeat(seq(choice($.pre_else, $.pre_elsif), '\n', repeat($.description))),
+    $.pre_endif,
+  ),
+
+  pre_ifdef: $ => seq(choice('`ifdef', '`if'), $.id),
+  pre_ifndef: $ => seq('`ifndef', $.id),
+  pre_else: _ => '`else',
+  pre_elsif: $ => seq('`elsif', $.id),
+  pre_endif: _ => '`endif',
+
+  pre_line: $ => seq('`line', $.number, $.string_literal, $.number),
+  pre_undef: $ => seq('`undef', $.id),
 };
 
 module.exports = grammar({
