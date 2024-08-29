@@ -486,6 +486,8 @@ const rules = {
 
   pre_line: $ => seq('`line', $.number, $.string_literal, $.number),
   pre_undef: $ => seq('`undef', $.id),
+
+  pre_defined_content: $ => seq('`', $.id),
 };
 
 module.exports = grammar({
@@ -495,7 +497,8 @@ module.exports = grammar({
   extras: $ => [
     /\s|\\\r?\n/,
     $.comment,
-    $.template
+    $.template,
+    $.pre_defined_content,
   ]
 });
 
